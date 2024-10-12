@@ -99,7 +99,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 # Registration Endpoint
-@app.post("/register", status_code=status.HTTP_201_CREATED)
+@app.post("/register", status_code=status.HTTP_201_CREATED, methods=["POST", "OPTIONS"], include_in_schema=False)
 def register(user: UserCreate, db: Session = Depends(get_db)):
     db_user = get_user_by_email(db, user.email)
     if db_user:
@@ -119,7 +119,7 @@ class OAuth2PasswordRequestForm(BaseModel):
     email_or_phone: str
     password: str
 
-@app.post("/token", response_model=Token)
+@app.post("/token", response_model=Token, methods=["POST", "OPTIONS"], include_in_schema=False)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm, db: Session = Depends(get_db)):
     user = get_user_by_email(db, form_data.email_or_phone)
     if not user:
