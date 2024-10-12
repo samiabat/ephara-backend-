@@ -64,11 +64,8 @@ app = FastAPI()
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host=HOST, port=PORT, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
 
-# Set host to 0.0.0.0 for deployment
-HOST = '0.0.0.0'
-PORT = 8000
 
 # Dependency to get DB session
 def get_db():
