@@ -9,6 +9,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 import os
 import secrets
+from fastapi.middleware.cors import CORSMiddleware
 
 # Setup Database
 DATABASE_URL = "sqlite:///./test.db"
@@ -62,6 +63,14 @@ class TokenData(BaseModel):
 # FastAPI instance
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can specify certain domains if you don't want to allow all
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
@@ -99,7 +108,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 # Registration Endpoint
-@app.post("/register", status_code=status.HTTP_201_CREATED, methods=["POST", "OPTIONS"], include_in_schema=False)
+@app.post("/register", status_code=status.HTTP_201_CREATED)
 def register(user: UserCreate, db: Session = Depends(get_db)):
     db_user = get_user_by_email(db, user.email)
     if db_user:
@@ -119,7 +128,7 @@ class OAuth2PasswordRequestForm(BaseModel):
     email_or_phone: str
     password: str
 
-@app.post("/token", response_model=Token, methods=["POST", "OPTIONS"], include_in_schema=False)
+@app.post("/token", response_model=Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm, db: Session = Depends(get_db)):
     user = get_user_by_email(db, form_data.email_or_phone)
     if not user:
